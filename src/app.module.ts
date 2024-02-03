@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { DatbaseModule } from './common/database/database.module';
+import { GraphQLModule } from '@nestjs/graphql'
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -12,7 +15,12 @@ import { DatbaseModule } from './common/database/database.module';
       MONGODB_URI: Joi.string().required(),
     })
   }),
+  GraphQLModule.forRoot<ApolloDriverConfig>({
+    driver: ApolloDriver,
+    autoSchemaFile: true,
+  }),
   DatbaseModule,
+  UsersModule,
 ],
 
   controllers: [AppController],

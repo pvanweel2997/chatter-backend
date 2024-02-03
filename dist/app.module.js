@@ -13,6 +13,9 @@ const app_service_1 = require("./app.service");
 const config_1 = require("@nestjs/config");
 const Joi = require("joi");
 const database_module_1 = require("./common/database/database.module");
+const graphql_1 = require("@nestjs/graphql");
+const apollo_1 = require("@nestjs/apollo");
+const users_module_1 = require("./users/users.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -24,8 +27,12 @@ exports.AppModule = AppModule = __decorate([
                     MONGODB_URI: Joi.string().required(),
                 })
             }),
+            graphql_1.GraphQLModule.forRoot({
+                driver: apollo_1.ApolloDriver,
+                autoSchemaFile: true,
+            }),
             database_module_1.DatbaseModule,
-        ],
+            users_module_1.UsersModule,],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
