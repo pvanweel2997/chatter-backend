@@ -16,23 +16,45 @@ const database_module_1 = require("./common/database/database.module");
 const graphql_1 = require("@nestjs/graphql");
 const apollo_1 = require("@nestjs/apollo");
 const users_module_1 = require("./users/users.module");
+const nestjs_pino_1 = require("nestjs-pino");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot({
+        imports: [
+            config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 validationSchema: Joi.object({
                     MONGODB_URI: Joi.string().required(),
-                })
+                }),
             }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: true,
             }),
             database_module_1.DatbaseModule,
-            users_module_1.UsersModule,],
+            users_module_1.UsersModule,
+            nestjs_pino_1.LoggerModule.forRootAsync({
+                useFactory: (configService) => {
+                    const isProduction = configService.get('NODE_ENV') === 'production';
+                    return {
+                        pinoHttp: {
+                            transport: isProduction
+                                ? undefined
+                                : {
+                                    target: 'pino-pretty',
+                                    options: {
+                                        singleLine: true,
+                                    },
+                                },
+                            level: isProduction ? 'info' : 'debug',
+                        },
+                    };
+                },
+                inject: [config_1.ConfigService],
+            }),
+        ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
