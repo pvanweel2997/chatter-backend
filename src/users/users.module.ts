@@ -7,10 +7,9 @@ import { User, UserSchema } from './entities/user.entity';
 
 @Module({
   imports: [
-    DatbaseModule.forFeature([
-      { name: User.name, schema: UserSchema }
-    ])
+    DatbaseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   providers: [UsersResolver, UsersService, UsersRepository],
+  exports: [UsersService],
 })
 export class UsersModule {}
