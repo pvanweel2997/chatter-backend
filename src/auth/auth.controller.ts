@@ -17,4 +17,10 @@ export class AuthController {
   ) {
     await this.authService.login(user, response);
   }
+
+  @Post('logout')
+  logout(@Res({ passthrough: true }) response: Response) {
+    console.log('=== made it here');
+    this.authService.logout(response);
+  }
 }
