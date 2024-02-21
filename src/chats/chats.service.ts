@@ -14,12 +14,12 @@ export class ChatsService {
     });
   }
 
-  findAll() {
-    return `This action returns all chats`;
+  async findAll() {
+    return await this.chatsRepository.find({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} chat`;
+  async findOne(_id: string) {
+    return await this.chatsRepository.findOne({ _id });
   }
 
   update(id: number, updateChatInput: UpdateChatInput) {

@@ -7,6 +7,7 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { TokenPayload } from 'src/auth/token-payload.interface';
+import { string } from 'joi';
 
 @Resolver(() => Chat)
 export class ChatsResolver {
@@ -26,8 +27,8 @@ export class ChatsResolver {
   }
 
   @Query(() => Chat, { name: 'chat' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.chatsService.findOne(id);
+  findOne(@Args('_id') _id: string) {
+    return this.chatsService.findOne(_id);
   }
 
   @Mutation(() => Chat)
