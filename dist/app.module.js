@@ -20,6 +20,7 @@ const nestjs_pino_1 = require("nestjs-pino");
 const auth_module_1 = require("./auth/auth.module");
 const chats_module_1 = require("./chats/chats.module");
 const pubsub_module_1 = require("./common/pubsub/pubsub.module");
+const auth_service_1 = require("./auth/auth.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -32,12 +33,28 @@ exports.AppModule = AppModule = __decorate([
                     MONGODB_URI: Joi.string().required(),
                 }),
             }),
-            graphql_1.GraphQLModule.forRoot({
+            graphql_1.GraphQLModule.forRootAsync({
                 driver: apollo_1.ApolloDriver,
-                autoSchemaFile: true,
-                subscriptions: {
-                    'graphql-ws': true,
-                },
+                useFactory: (authService) => ({
+                    autoSchemaFile: true,
+                    subscriptions: {
+                        'graphql-ws': {
+                            onConnect: (context) => {
+                                try {
+                                    const request = context.extra.request;
+                                    const user = authService.verifyWs(request);
+                                    context.user = user;
+                                }
+                                catch (e) {
+                                    new common_1.Logger().error(e);
+                                    throw new common_1.UnauthorizedException();
+                                }
+                            },
+                        },
+                    },
+                }),
+                imports: [auth_module_1.AuthModule],
+                inject: [auth_service_1.default],
             }),
             database_module_1.DatbaseModule,
             users_module_1.UsersModule,
