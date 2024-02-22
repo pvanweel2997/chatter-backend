@@ -19,6 +19,7 @@ const users_module_1 = require("./users/users.module");
 const nestjs_pino_1 = require("nestjs-pino");
 const auth_module_1 = require("./auth/auth.module");
 const chats_module_1 = require("./chats/chats.module");
+const pubsub_module_1 = require("./common/pubsub/pubsub.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -34,6 +35,9 @@ exports.AppModule = AppModule = __decorate([
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: true,
+                subscriptions: {
+                    'graphql-ws': true,
+                },
             }),
             database_module_1.DatbaseModule,
             users_module_1.UsersModule,
@@ -58,6 +62,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             auth_module_1.AuthModule,
             chats_module_1.ChatsModule,
+            pubsub_module_1.PubSubModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
