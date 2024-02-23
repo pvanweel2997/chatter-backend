@@ -56,7 +56,7 @@ exports.AppModule = AppModule = __decorate([
                 imports: [auth_module_1.AuthModule],
                 inject: [auth_service_1.default],
             }),
-            database_module_1.DatbaseModule,
+            database_module_1.DatabaseModule,
             users_module_1.UsersModule,
             nestjs_pino_1.LoggerModule.forRootAsync({
                 useFactory: (configService) => {

@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
-import { DatbaseModule } from './common/database/database.module';
+import { DatabaseModule } from './common/database/database.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UsersModule } from './users/users.module';
@@ -44,7 +44,7 @@ import AuthService from './auth/auth.service';
       imports: [AuthModule],
       inject: [AuthService],
     }),
-    DatbaseModule,
+    DatabaseModule,
     UsersModule,
     LoggerModule.forRootAsync({
       useFactory: (configService: ConfigService) => {

@@ -1,28 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChatInput } from './dto/create-chat.input';
 import { UpdateChatInput } from './dto/update-chat.input';
 import { ChatsRepository } from './chats.repository';
+import { PipelineStage, Types } from 'mongoose';
 
 @Injectable()
 export class ChatsService {
-  constructor(private chatsRepository: ChatsRepository) {}
+  constructor(private readonly chatsRepository: ChatsRepository) {}
+
   async create(createChatInput: CreateChatInput, userId: string) {
-    return await this.chatsRepository.create({
+    console.log('=== in the create');
+    return this.chatsRepository.create({
       ...createChatInput,
       userId,
-      userIds: createChatInput.userIds || [],
       messages: [],
     });
   }
 
-  async findAll(userId: string) {
-    return await this.chatsRepository.find({
-      ...this.userChatFilter(userId),
+  async findMany(prePipelineStages: PipelineStage[] = []) {
+    const chats = await this.chatsRepository.model.aggregate([
+      ...prePipelineStages,
+      { $set: { latestMessage: { $arrayElemAt: ['$messages', -1] } } },
+      { $unset: 'messages' },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'latestMessage.userId',
+          foreignField: '_id',
+          as: 'latestMessage.user',
+        },
+      },
+    ]);
+    chats.forEach((chat) => {
+      if (!chat.latestMessage?._id) {
+        delete chat.latestMessage;
+        return;
+      }
+      chat.latestMessage.user = chat.latestMessage.user[0];
+      delete chat.latestMessage.userId;
+      chat.latestMessage.chatId = chat._id;
     });
+    return chats;
   }
 
   async findOne(_id: string) {
-    return await this.chatsRepository.findOne({ _id });
+    const chats = await this.findMany([
+      { $match: { chatId: new Types.ObjectId(_id) } },
+    ]);
+    if (!chats[0]) {
+      throw new NotFoundException(`No chat was found with ID ${_id}`);
+    }
+    return chats[0];
   }
 
   update(id: number, updateChatInput: UpdateChatInput) {
@@ -31,19 +59,5 @@ export class ChatsService {
 
   remove(id: number) {
     return `This action removes a #${id} chat`;
-  }
-
-  userChatFilter(userId: string) {
-    return {
-      $or: [
-        { userId },
-        {
-          userIds: {
-            $in: [userId],
-          },
-        },
-        { isPrivate: false },
-      ],
-    };
   }
 }

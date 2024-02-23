@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ModelDefinition, MongooseModule } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
 import { DbMigrationService } from './db-migration.service';
 
 @Module({
@@ -15,7 +14,7 @@ import { DbMigrationService } from './db-migration.service';
   ],
   providers: [DbMigrationService],
 })
-export class DatbaseModule {
+export class DatabaseModule {
   static forFeature(models: ModelDefinition[]) {
     return MongooseModule.forFeature(models);
   }
