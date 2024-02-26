@@ -10,7 +10,6 @@ export class ChatsService {
   constructor(private readonly chatsRepository: ChatsRepository) {}
 
   async create(createChatInput: CreateChatInput, userId: string) {
-    console.log('=== in the create');
     return this.chatsRepository.create({
       ...createChatInput,
       userId,
