@@ -14,6 +14,6 @@ export class Message extends AbstractEntity {
   @Field()
   user: User;
 
-  @Field(() => User)
+  @Field()
   chatId: string;
 }
