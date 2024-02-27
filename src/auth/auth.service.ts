@@ -21,9 +21,8 @@ export class AuthService {
         Number(this.configService.getOrThrow('JWT_EXPIRATION')),
     );
     const tokenPayload: TokenPayload = {
+      ...user,
       _id: user._id.toHexString(),
-      email: user.email,
-      username: user.username,
     };
     const token = this.jwtService.sign(tokenPayload);
     response.cookie('Authentication', token, {

@@ -7,46 +7,49 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { TokenPayload } from '../auth/token-payload.interface';
+import { Types } from 'mongoose';
 
 @Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Mutation(() => User)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.usersService.create(createUserInput);
+  async createUser(
+    @Args('createUserInput') createUserInput: CreateUserInput,
+  ): Promise<User> {
+    return await this.usersService.create(createUserInput);
   }
 
   @Query(() => [User], { name: 'users' })
   @UseGuards(GqlAuthGuard)
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(): Promise<User[]> {
+    return await this.usersService.findAll();
   }
 
   @Query(() => User, { name: 'user' })
   @UseGuards(GqlAuthGuard)
-  findOne(@Args('_id') _id: string) {
-    return this.usersService.findOne(_id);
+  async findOne(@Args('_id') _id: string): Promise<User> {
+    return await this.usersService.findOne(_id);
   }
 
   @Mutation(() => User)
   @UseGuards(GqlAuthGuard)
-  updateUser(
+  async updateUser(
     @Args('updateUserInput') updateUserInput: UpdateUserInput,
     @CurrentUser() user: TokenPayload,
-  ) {
-    return this.usersService.update(user._id, updateUserInput);
+  ): Promise<User> {
+    return await this.usersService.update(user._id, updateUserInput);
   }
 
   @Mutation(() => User)
   @UseGuards(GqlAuthGuard)
-  removeUser(@CurrentUser() user: TokenPayload) {
-    return this.usersService.remove(user._id);
+  async removeUser(@CurrentUser() user: TokenPayload): Promise<User> {
+    return await this.usersService.remove(user._id);
   }
 
   @UseGuards(GqlAuthGuard)
   @Query(() => User, { name: 'me' })
-  getMe(@CurrentUser() user: TokenPayload) {
-    return user;
+  async getMe(@CurrentUser() user: TokenPayload): Promise<User> {
+    return { ...user, _id: new Types.ObjectId(user._id) };
   }
 }
